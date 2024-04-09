@@ -1,6 +1,10 @@
 "use server";
 
-import axios from "axios";
+import { currentUser } from "@clerk/nextjs";
+import db from "@/lib/db";
+import OpenAI from "openai";
+
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 export async function generateForm(
   prevState: {
@@ -13,30 +17,22 @@ export async function generateForm(
   const description = formData.get("description");
 
   try {
-    const response = await axios.post(
-      "https://api.openai.com/v1/chat/completions",
-      {
-        model: "gpt-3.5-turbo",
-        messages: [
-          {
-            role: "system",
-            content: `${description} ${promptExplanation}`,
-          },
-        ],
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+    const response = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages: [
+        {
+          role: "system",
+          content: `${description} ${promptExplanation}`,
         },
-      }
-    );
+      ],
+    });
 
-    const responseObj = JSON.parse(response.data.choices[0].message.content);
+    const responseObj = JSON.parse(response.choices[0].message.content!);
 
     return {
       message: "success",
       data: responseObj,
-      rowData: response.data,
+      rowData: response,
     };
   } catch (e) {
     console.log({ e });
@@ -44,4 +40,42 @@ export async function generateForm(
       message: "Failed to create form",
     };
   }
+}
+
+export async function createFormManully(data: {
+  name: string;
+  description: string;
+}) {
+  const user = await currentUser();
+  if (!user) throw new Error("Please login to proceed");
+
+  const { name, description } = data;
+
+  const form = await db.form.create({
+    data: {
+      userId: user.id,
+      name,
+      description,
+    },
+  });
+
+  if (!form) {
+    throw new Error("something went wrong");
+  }
+
+  return form.id;
+}
+
+export async function getForms() {
+  const user = await currentUser();
+  if (!user) throw new Error("Please login to proceed");
+
+  return await db.form.findMany({
+    where: {
+      userId: user.id,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
 }

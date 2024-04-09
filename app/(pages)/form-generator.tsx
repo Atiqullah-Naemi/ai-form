@@ -12,7 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 
-import { generateForm } from "@/app/actions/generateForm";
+import { generateForm } from "@/app/actions/form";
 import { useFormState, useFormStatus } from "react-dom";
 
 import { Plus } from "lucide-react";
