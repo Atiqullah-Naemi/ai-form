@@ -49,7 +49,6 @@ const FormGenerator = (props: Props) => {
     setOpen(true);
   };
 
-  console.log({ state });
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <Button onClick={onFormCreate}>

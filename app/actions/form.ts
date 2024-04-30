@@ -79,3 +79,17 @@ export async function getForms() {
     },
   });
 }
+
+export async function getFormById(id: number) {
+  const user = await currentUser();
+  if (!user) {
+    throw new Error();
+  }
+
+  return await db.form.findUnique({
+    where: {
+      userId: user.id,
+      id,
+    },
+  });
+}

@@ -130,7 +130,7 @@ function Designer() {
   return (
     <div className="flex w-full h-full">
       <div
-        className="p-4 w-full"
+        className="p-4 w-full h-full"
         onClick={() => {
           if (selectedElement) setSelectedElement(null);
         }}

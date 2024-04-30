@@ -9,6 +9,7 @@ import { SubTitleFieldFormElement } from "./fields/sub-title";
 import { TextAreaFormElement } from "./fields/textarea";
 import { TextFieldFormElement } from "./fields/text-field";
 import { TitleFieldFormElement } from "./fields/title";
+import { ImageFieldFormElement } from "./fields/image";
 
 export type ElementsType =
   | "TextField"
@@ -17,6 +18,7 @@ export type ElementsType =
   | "ParagraphField"
   | "SeparatorField"
   | "SpacerField"
+  | "ImageField"
   | "NumberField"
   | "TextAreaField"
   | "DateField"
@@ -67,6 +69,7 @@ export const FormElements: FormElementsType = {
   ParagraphField: ParagprahFieldFormElement,
   SeparatorField: SeparatorFieldFormElement,
   SpacerField: SpacerFieldFormElement,
+  ImageField: ImageFieldFormElement,
   NumberField: NumberFieldFormElement,
   TextAreaField: TextAreaFormElement,
   DateField: DateFieldFormElement,
