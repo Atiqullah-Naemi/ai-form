@@ -20,7 +20,7 @@ interface FileProps {
   setFile: (file: File) => void;
 }
 
-const useFileUpload = create<FileProps>((set) => ({
+export const useFileUpload = create<FileProps>((set) => ({
   file: null,
   setFile: (file) => set({ file }),
 }));
@@ -39,6 +39,9 @@ const DesignerComponent = memo(function DesignerComponent({
 }: {
   elementInstance: FormElementInstance;
 }) {
+  const element = elementInstance as CustomInstance;
+  const { imageUrl: url } = element.extraAttributes;
+
   const { file } = useFileUpload();
 
   const imageUrl = useMemo(() => {
@@ -53,12 +56,12 @@ const DesignerComponent = memo(function DesignerComponent({
   }, [file]);
 
   return (
-    <div className="flex flex-col gap-2 w-full">
-      {imageUrl && (
+    <div className="flex flex-col gap-2 w-full asdfasdfasdfasfs">
+      {(imageUrl || url) && (
         <div className="relative w-[100px]  h-[100px]">
           <Image
             className="h-full w-full rounded-md object-cover"
-            src={imageUrl as string}
+            src={(imageUrl as string) || (url as string)}
             alt="image"
             fill
           />
@@ -73,6 +76,9 @@ function FormComponent({
 }: {
   elementInstance: FormElementInstance;
 }) {
+  const element = elementInstance as CustomInstance;
+  const { imageUrl: url } = element.extraAttributes;
+
   const { file } = useFileUpload();
 
   const imageUrl = useMemo(() => {
@@ -87,12 +93,12 @@ function FormComponent({
   }, [file]);
 
   return (
-    <div className="flex flex-col gap-2 w-full">
-      {imageUrl && (
-        <div className="relative w-[100px]  h-[100px]">
+    <div className="flex flex-col gap-2 w-full asdfasdfasdfasfs">
+      {(imageUrl || url) && (
+        <div className="relative w-full  h-[100px]">
           <Image
             className="h-full w-full rounded-md object-cover"
-            src={imageUrl as string}
+            src={(imageUrl as string) || (url as string)}
             alt="image"
             fill
           />
@@ -108,7 +114,6 @@ function PropertiesComponent({
   elementInstance: FormElementInstance;
 }) {
   const { file, setFile } = useFileUpload();
-  const { edgestore } = useEdgeStore();
 
   const element = elementInstance as CustomInstance;
   const { updateElement } = useDesigner();
@@ -147,25 +152,6 @@ function PropertiesComponent({
               setFile(file);
             }}
           />
-
-          <button
-            onClick={async () => {
-              if (file) {
-                const res = await edgestore.publicFiles.upload({
-                  file,
-                  onProgressChange: (progress) => {
-                    // you can use this to show a progress bar
-                    console.log(progress);
-                  },
-                });
-                // you can run some server action or api here
-                // to add the necessary data to your database
-                console.log(res);
-              }
-            }}
-          >
-            Upload
-          </button>
         </>
       </form>
     </Form>

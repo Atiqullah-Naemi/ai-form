@@ -5,19 +5,41 @@ import useDesigner from "../hooks/useDesigner";
 import { updateFormContent } from "@/app/actions/form";
 import { toast } from "./ui/use-toast";
 import { LoaderCircle } from "lucide-react";
+import { useFileUpload } from "@/components/fields/image";
+import { useEdgeStore } from "@/lib/edgestore";
 
 function SaveFormBtn({ id }: { id: number }) {
   const { elements } = useDesigner();
   const [loading, startTransition] = useTransition();
+  const { edgestore } = useEdgeStore();
+  const { file } = useFileUpload();
 
   const onUpdateFormContent = async () => {
     try {
-      const jsonElements = JSON.stringify(elements);
-      await updateFormContent(id, jsonElements);
-      toast({
-        title: "Success",
-        description: "Your form has been saved",
-      });
+      if (file) {
+        const res = await edgestore.publicFiles.upload({
+          file,
+          onProgressChange: () => {},
+        });
+
+        const newElements = elements.map((element) => {
+          return {
+            ...element,
+            extraAttributes: {
+              ...element.extraAttributes,
+              imageUrl: element.type === "ImageField" ? res.url : undefined,
+            },
+          };
+        });
+
+        const jsonElements = JSON.stringify(newElements);
+
+        await updateFormContent(id, jsonElements);
+        toast({
+          title: "Success",
+          description: "Your form has been saved",
+        });
+      }
     } catch (error) {
       toast({
         title: "Error",

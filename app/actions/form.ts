@@ -93,3 +93,64 @@ export async function getFormById(id: number) {
     },
   });
 }
+
+export async function updateFormContent(id: number, jsonContent: string) {
+  const user = await currentUser();
+  if (!user) {
+    throw new Error();
+  }
+
+  return await db.form.update({
+    where: {
+      userId: user.id,
+      id,
+    },
+    data: {
+      content: jsonContent,
+    },
+  });
+}
+
+export async function publishForm(id: number) {
+  const user = await currentUser();
+  if (!user) {
+    throw new Error();
+  }
+
+  return await db.form.update({
+    data: {
+      published: true,
+    },
+    where: {
+      userId: user.id,
+      id,
+    },
+  });
+}
+
+export async function getFormContentByUrl(formUrl: string) {
+  return await db.form.findUnique({
+    where: {
+      shareURL: formUrl,
+    },
+  });
+}
+
+export async function submitForm(formUrl: string, content: string) {
+  return await db.form.update({
+    data: {
+      submissions: {
+        increment: 1,
+      },
+      FormSubmissions: {
+        create: {
+          content,
+        },
+      },
+    },
+    where: {
+      shareURL: formUrl,
+      published: true,
+    },
+  });
+}
