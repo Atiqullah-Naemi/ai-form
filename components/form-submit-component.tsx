@@ -42,7 +42,7 @@ function FormSubmitComponent({
     formValues.current[key] = value;
   }, []);
 
-  const submitForm = async () => {
+  const onSubmitForm = async () => {
     formErrors.current = {};
     const validForm = validateForm();
     if (!validForm) {
@@ -102,7 +102,7 @@ function FormSubmitComponent({
         <Button
           className="mt-8"
           onClick={() => {
-            startTransition(submitForm);
+            startTransition(onSubmitForm);
           }}
           disabled={pending}
         >

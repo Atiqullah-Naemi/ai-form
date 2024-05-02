@@ -11,9 +11,10 @@ import { useForm } from "react-hook-form";
 import { memo, useMemo } from "react";
 import useDesigner from "../../hooks/useDesigner";
 import { SingleImageDropzone } from "@/components/single-image-dropzone";
-import { useEdgeStore } from "@/lib/edgestore";
-import { Form } from "../ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "../ui/form";
 import { create } from "zustand";
+import { cn } from "@/lib/utils";
+import { Input } from "../ui/input";
 
 interface FileProps {
   file: File | null;
@@ -31,7 +32,7 @@ const extraAttributes = {
   label: "Image field",
   helperText: "Helper text",
   required: false,
-  imageUrl: "",
+  image: { url: "", height: 0 },
 };
 
 const DesignerComponent = memo(function DesignerComponent({
@@ -40,7 +41,7 @@ const DesignerComponent = memo(function DesignerComponent({
   elementInstance: FormElementInstance;
 }) {
   const element = elementInstance as CustomInstance;
-  const { imageUrl: url } = element.extraAttributes;
+  const { image } = element.extraAttributes;
 
   const { file } = useFileUpload();
 
@@ -57,11 +58,11 @@ const DesignerComponent = memo(function DesignerComponent({
 
   return (
     <div className="flex flex-col gap-2 w-full asdfasdfasdfasfs">
-      {(imageUrl || url) && (
+      {(imageUrl || image.url) && (
         <div className="relative w-[100px]  h-[100px]">
           <Image
             className="h-full w-full rounded-md object-cover"
-            src={(imageUrl as string) || (url as string)}
+            src={(imageUrl as string) || (image.url as string)}
             alt="image"
             fill
           />
@@ -77,7 +78,7 @@ function FormComponent({
   elementInstance: FormElementInstance;
 }) {
   const element = elementInstance as CustomInstance;
-  const { imageUrl: url } = element.extraAttributes;
+  const { image } = element.extraAttributes;
 
   const { file } = useFileUpload();
 
@@ -93,12 +94,17 @@ function FormComponent({
   }, [file]);
 
   return (
-    <div className="flex flex-col gap-2 w-full asdfasdfasdfasfs">
-      {(imageUrl || url) && (
-        <div className="relative w-full  h-[100px]">
+    <div className="flex flex-col gap-2 w-full">
+      {(imageUrl || image.url) && (
+        <div
+          className={cn("relative w-full")}
+          style={{
+            height: image.height ? `${image.height}px` : "100px",
+          }}
+        >
           <Image
             className="h-full w-full rounded-md object-cover"
-            src={(imageUrl as string) || (url as string)}
+            src={(imageUrl as string) || (image.url as string)}
             alt="image"
             fill
           />
@@ -120,16 +126,20 @@ function PropertiesComponent({
   const form = useForm({
     mode: "onBlur",
     defaultValues: {
-      imageUrl: element.extraAttributes.imageUrl,
+      image: {
+        height: element.extraAttributes.image.height,
+        url: element.extraAttributes.image.url,
+      },
     },
   });
 
   function applyChanges(values: any) {
-    const { imageUrl } = values;
+    const { image } = values;
     updateElement(element.id, {
       ...element,
       extraAttributes: {
-        imageUrl,
+        ...element.extraAttributes,
+        image: { height: image.height, url: image.url },
       },
     });
   }
@@ -143,16 +153,31 @@ function PropertiesComponent({
         }}
         className="space-y-3"
       >
-        <>
-          <SingleImageDropzone
-            width={200}
-            height={200}
-            value={file as File}
-            onChange={(file: any) => {
-              setFile(file);
-            }}
-          />
-        </>
+        <SingleImageDropzone
+          width={200}
+          height={200}
+          value={file as File}
+          onChange={(file: any) => {
+            setFile(file);
+          }}
+        />
+        <FormField
+          control={form.control}
+          name="image.height"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Height</FormLabel>
+              <FormControl>
+                <Input
+                  {...field}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") e.currentTarget.blur();
+                  }}
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
       </form>
     </Form>
   );

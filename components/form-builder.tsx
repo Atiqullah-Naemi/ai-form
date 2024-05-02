@@ -4,7 +4,7 @@ import { Form } from "@prisma/client";
 import React, { useEffect, useState } from "react";
 import PreviewDialogBtn from "./preview-dialogue-btn";
 import PublishFormBtn from "./publish-form-btn";
-import SaveFormBtn from "./save-form--btn";
+import SaveFormBtn from "./save-form-btn";
 import Designer from "./designer";
 import {
   DndContext,

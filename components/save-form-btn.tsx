@@ -27,7 +27,10 @@ function SaveFormBtn({ id }: { id: number }) {
             ...element,
             extraAttributes: {
               ...element.extraAttributes,
-              imageUrl: element.type === "ImageField" ? res.url : undefined,
+              image: {
+                ...element?.extraAttributes?.image,
+                url: element.type === "ImageField" ? res.url : undefined,
+              },
             },
           };
         });
