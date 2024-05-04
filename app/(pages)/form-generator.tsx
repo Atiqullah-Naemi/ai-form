@@ -13,7 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { generateForm } from "@/app/actions/form";
 import { useFormState, useFormStatus } from "react-dom";
 
-import { Plus } from "lucide-react";
+import { FileIcon, Loader, Plus } from "lucide-react";
 
 type Props = {};
 
@@ -27,8 +27,8 @@ const initialState: {
 export function SubmitButton() {
   const { pending } = useFormStatus();
   return (
-    <Button type="submit" disabled={pending}>
-      {pending ? "Generating..." : "Generate"}
+    <Button type="submit" disabled={pending} className="w-full">
+      {pending ? <Loader className="animate-spin" /> : "Generate"}
     </Button>
   );
 }
@@ -49,9 +49,15 @@ const FormGenerator = (props: Props) => {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <Button onClick={onFormCreate}>
-        <Plus className="w-4 h-4 mr-2" />
-        Create Form
+      <Button
+        onClick={onFormCreate}
+        variant={"outline"}
+        className="group border border-primary/20 h-[190px] items-center justify-center flex flex-col hover:border-primary hover:cursor-pointer border-dashed gap-4"
+      >
+        <FileIcon className="h-8 w-8 text-muted-foreground group-hover:text-primary" />
+        <p className="font-bold text-xl text-muted-foreground group-hover:text-primary">
+          Create new form
+        </p>
       </Button>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
@@ -68,7 +74,6 @@ const FormGenerator = (props: Props) => {
           </div>
           <DialogFooter>
             <SubmitButton />
-            <Button variant="link">Create Manually</Button>
           </DialogFooter>
         </form>
       </DialogContent>
