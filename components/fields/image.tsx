@@ -95,7 +95,7 @@ function FormComponent({
 
   return (
     <div className="flex flex-col gap-2 w-full">
-      {(imageUrl || image.url) && (
+      {(imageUrl || image?.url) && (
         <div
           className={cn("relative w-full")}
           style={{

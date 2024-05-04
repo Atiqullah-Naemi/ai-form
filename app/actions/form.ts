@@ -12,9 +12,12 @@ export async function generateForm(
   },
   formData: FormData
 ) {
+  const user = await currentUser();
+  if (!user) throw new Error("Please login to proceed");
+
   const promptExplanation =
     "Based on the description, generate a survey object with 3 fields: name(string) for the form, description(string) of the form and a questions array where every element has 3 fields: label and the fieldType and fieldType can be of these options RadioGroup, Select, Input, Textarea, Switch; and return it in json format. For RadioGroup, and Select types also return fieldOptions array with label and value fields. For example, for RadioGroup, and Select types, the field options array can be [{label: 'Yes', value: 'yes'}, {label: 'No', value: 'no'}] and for Input, Textarea, and Switch types, the fieldOptions array can be empty. For example, for Input, Textarea, and Switch types, the fieldOptions array can be [] and Input should also have type and it should be either text, email, or passsord and Input should not have field options";
-  const description = formData.get("description");
+  const formDescription = formData.get("description");
 
   try {
     const response = await openai.chat.completions.create({
@@ -22,17 +25,44 @@ export async function generateForm(
       messages: [
         {
           role: "system",
-          content: `${description} ${promptExplanation}`,
+          content: `${formDescription} ${promptExplanation}`,
         },
       ],
     });
 
     const responseObj = JSON.parse(response.choices[0].message.content!);
 
+    const { name, description } = responseObj;
+
+    const newElements = responseObj.questions.map((q: any) => {
+      return {
+        id: `${Math.floor(1000 + Math.random() * 9000)}`,
+        extraAttributes: {
+          label: q.label,
+          placeHolder: q.label,
+          helperText: "",
+          required: false,
+        },
+        type: q.type === "checkbox" ? "CheckboxField" : "TextField",
+      };
+    });
+
+    const form = await db.form.create({
+      data: {
+        userId: user.id,
+        name,
+        description,
+        content: JSON.stringify(newElements),
+      },
+    });
+
+    if (!form) {
+      throw new Error("something went wrong");
+    }
+
     return {
       message: "success",
-      data: responseObj,
-      rowData: response,
+      formId: form.id,
     };
   } catch (e) {
     console.log({ e });
@@ -137,7 +167,7 @@ export async function getFormContentByUrl(formUrl: string) {
 }
 
 export async function submitForm(formUrl: string, content: string) {
-  return await db.form.update({
+  const res = await db.form.update({
     data: {
       submissions: {
         increment: 1,
@@ -152,5 +182,38 @@ export async function submitForm(formUrl: string, content: string) {
       shareURL: formUrl,
       published: true,
     },
+  });
+
+  return res;
+}
+
+export async function getFormWithSubmissions(id: number) {
+  const user = await currentUser();
+  if (!user) {
+    throw new Error();
+  }
+
+  return await db.form.findUnique({
+    where: {
+      userId: user.id,
+      id,
+    },
+    include: {
+      FormSubmissions: true,
+    },
+  });
+}
+export async function updateFormIntegration(id: number, googleSheetId: string) {
+  const user = await currentUser();
+  if (!user) {
+    throw new Error();
+  }
+
+  return await db.form.update({
+    where: {
+      userId: user.id,
+      id,
+    },
+    data: { googleSheetId },
   });
 }
