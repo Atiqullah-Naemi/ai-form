@@ -55,7 +55,7 @@ function CreateFormBtn() {
         >
           <FileIcon className="h-8 w-8 text-muted-foreground group-hover:text-primary" />
           <p className="font-bold text-xl text-muted-foreground group-hover:text-primary">
-            Create new form
+            Create new form manully
           </p>
         </Button>
       </DialogTrigger>
