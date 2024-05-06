@@ -203,17 +203,3 @@ export async function getFormWithSubmissions(id: number) {
     },
   });
 }
-export async function updateFormIntegration(id: number, googleSheetId: string) {
-  const user = await currentUser();
-  if (!user) {
-    throw new Error();
-  }
-
-  return await db.form.update({
-    where: {
-      userId: user.id,
-      id,
-    },
-    data: { googleSheetId },
-  });
-}
