@@ -144,7 +144,7 @@ function FormComponent({
           <Calendar
             mode="single"
             selected={date}
-            onSelect={(date: Date) => {
+            onDayClick={(date: Date) => {
               setDate(date);
 
               if (!submitValue) return;
