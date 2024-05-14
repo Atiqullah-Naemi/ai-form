@@ -14,6 +14,7 @@ import { generateForm } from "@/app/actions/form";
 import { useFormState, useFormStatus } from "react-dom";
 
 import { FileIcon, Loader, Plus } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 type Props = {};
 
@@ -34,14 +35,17 @@ export function SubmitButton() {
 }
 
 const FormGenerator = (props: Props) => {
+  const router = useRouter();
   const [state, formAction] = useFormState(generateForm, initialState);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
     if (state.message === "success") {
       setOpen(false);
+      router.refresh();
+      router.push("/");
     }
-  }, [state.message]);
+  }, [router, state.message]);
 
   const onFormCreate = () => {
     setOpen(true);

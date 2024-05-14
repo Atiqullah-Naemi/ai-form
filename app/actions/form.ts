@@ -43,7 +43,12 @@ export async function generateForm(
           helperText: "",
           required: false,
         },
-        type: q.type === "checkbox" ? "CheckboxField" : "TextField",
+        type:
+          q.fieldType === "Checkbox"
+            ? "CheckboxField"
+            : q.fieldType === "TextareaField"
+            ? "Textarea"
+            : "TextField",
       };
     });
 
