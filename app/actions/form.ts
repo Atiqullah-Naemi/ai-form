@@ -47,7 +47,7 @@ export async function generateForm(
           q.fieldType === "Checkbox"
             ? "CheckboxField"
             : q.fieldType === "Textarea"
-            ? "TextareaField"
+            ? "TextAreaField"
             : "TextField",
       };
     });
