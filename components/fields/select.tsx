@@ -181,7 +181,7 @@ function PropertiesComponent({
       helperText: element.extraAttributes.helperText,
       required: element.extraAttributes.required,
       placeHolder: element.extraAttributes.placeHolder,
-      options: element.extraAttributes.options,
+      options: element.extraAttributes.options as string[],
     },
   });
 
